@@ -75,7 +75,7 @@ public class SettingsFragment extends PreferenceFragment {
             }
             preference.setOnPreferenceClickListener(pref -> {
                 EditText editText = new EditText(getActivity());
-                editText.setHint(ConnectionConfiguration.XMPP_SERVER_HOST_P + ":80");
+                editText.setHint(ConnectionConfiguration.XMPP_SERVER_CHINA_HOST_P + ":80");
                 editText.setText(ConfigCenter.getInstance().getXMPPServer(getActivity()));
                 AlertDialog.Builder build = new AlertDialog.Builder(getActivity())
                         .setView(editText)

@@ -26,9 +26,11 @@ import com.oasisfeng.condom.CondomProcess;
 import com.topjohnwu.superuser.Shell;
 import com.xiaomi.channel.commonutils.android.DeviceInfo;
 import com.xiaomi.channel.commonutils.android.MIUIUtils;
+import com.xiaomi.channel.commonutils.android.Region;
 import com.xiaomi.channel.commonutils.logger.LoggerInterface;
 import com.xiaomi.channel.commonutils.logger.MyLog;
 import com.xiaomi.mipush.sdk.Logger;
+import com.xiaomi.push.service.AppRegionStorage;
 import com.xiaomi.xmsf.push.control.PushControllerUtils;
 import com.xiaomi.xmsf.push.control.XMOutbound;
 import com.xiaomi.xmsf.push.service.MiuiPushActivateService;
@@ -74,6 +76,14 @@ public class MiPushFrameworkApp extends Application {
         super.onCreate();
         Shell.getShell();
         instance = this;
+
+        LogUtils.init(this);
+        logger = XLog.tag(MiPushFrameworkApp.class.getSimpleName()).build();
+        logger.i("App starts: " + BuildConfig.VERSION_NAME);
+
+        initMiSdkLogger();
+        initPushLogger();
+
         try {
             Field MIUIUtils_isMIUI = MIUIUtils.class.getDeclaredField("isMIUI");
             MIUIUtils_isMIUI.setAccessible(true);
@@ -82,6 +92,10 @@ public class MiPushFrameworkApp extends Application {
             Field DeviceInfo_sCachedIMEI = DeviceInfo.class.getDeclaredField("sCachedIMEI");
             DeviceInfo_sCachedIMEI.setAccessible(true);
             DeviceInfo_sCachedIMEI.set(null, "");
+
+            AppRegionStorage regionStorage = AppRegionStorage.getInstance(getApplicationContext());
+            regionStorage.setRegion(Region.China.name());
+            regionStorage.setCountryCode("CN");
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -90,13 +104,6 @@ public class MiPushFrameworkApp extends Application {
                 getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
         RxActivityResult.register(this);
-
-        LogUtils.init(this);
-        logger = XLog.tag(MiPushFrameworkApp.class.getSimpleName()).build();
-        logger.i("App starts: " + BuildConfig.VERSION_NAME);
-
-        initMiSdkLogger();
-        initPushLogger();
 
         CondomOptions options = XMOutbound.create(this, TAG_CONDOM + "_PROCESS",
                 false);
